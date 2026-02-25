@@ -1,0 +1,22 @@
+{
+  "name": "watch-github-job",
+  "version": "1.0.0",
+  "description": "Watch a GitHub Actions run until it completes",
+  "type": "module",
+  "bin": {
+    "watch-github-job": "./dist/watch-github-job.js"
+  },
+  "scripts": {
+    "build": "bun build src/index.ts --target=node --outfile dist/watch-github-job.js && chmod +x dist/watch-github-job.js",
+    "dev": "bun run src/index.ts",
+    "link": "npm link"
+  },
+  "dependencies": {
+    "@commander-js/extra-typings": "^13.1.0",
+    "@clack/prompts": "^0.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "bun-types": "latest"
+  }
+}
