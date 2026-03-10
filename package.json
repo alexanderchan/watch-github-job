@@ -1,6 +1,6 @@
 {
   "name": "@alexmchan/watch-github-job",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Watch a GitHub Actions run until it completes",
   "type": "module",
   "bin": {
