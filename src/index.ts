@@ -13,6 +13,7 @@ const program = new Command()
   )
   .option("--no-open", "Don't open browser when run completes")
   .option("--timeout <minutes>", "Give up after N minutes", "35")
+  .option("--quiet", "Suppress intermediate status lines; only print run ID, URL, and final result")
   .addHelpText(
     "after",
     `
@@ -21,7 +22,8 @@ Examples:
   $ watch-github-job 22412559223              # watch by run ID
   $ watch-github-job https://github.com/.../actions/runs/22412559223
   $ watch-github-job --text "Build,Test"      # custom priority filters
-  $ watch-github-job --no-open --timeout 60   # no browser, longer timeout`
+  $ watch-github-job --no-open --timeout 60   # no browser, longer timeout
+  $ watch-github-job --quiet                  # minimal output for AI agents`
   )
   .action(async (run, opts) => {
     await watchRun({
@@ -29,6 +31,7 @@ Examples:
       textFilters: opts.text,
       openBrowser: opts.open,
       timeoutMinutes: parseInt(opts.timeout, 10),
+      quiet: opts.quiet ?? false,
     });
   });
 

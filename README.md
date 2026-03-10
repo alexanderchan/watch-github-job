@@ -20,6 +20,9 @@ watch-github-job --no-open
 
 # Longer timeout
 watch-github-job --timeout 60
+
+# Minimal output for AI agents (no intermediate status lines)
+watch-github-job --quiet --no-open
 ```
 
 While watching, it prints a single updating status line:
@@ -33,7 +36,7 @@ Elapsed time is measured from when the job actually started (not when you ran th
 On completion it prints the conclusion and opens the run in your browser:
 
 ```
-✅ Completed: success  (elapsed: 12m4s)
+✅ success  elapsed: 12m4s
 ```
 
 Exits `0` on success, `1` on failure or timeout.
@@ -80,15 +83,28 @@ Patterns are case-insensitive regular expressions, so `"CI"` matches `"CI / lint
 ## Installation
 
 ```bash
+npm install -g @alexmchan/watch-github-job
+```
+
+Requires [`gh`](https://cli.github.com/) (GitHub CLI) to be installed and authenticated.
+
+### Publishing
+
+```bash
+npm run release        # patch bump (1.0.0 → 1.0.1) + publish
+npm run release:minor  # minor bump (1.0.0 → 1.1.0) + publish
+npm run release:major  # major bump (1.0.0 → 2.0.0) + publish
+```
+
+### Local development
+
+```bash
 cd watch-github-job
 npm install
 npm run build
 npm link
 ```
 
-Requires `gh` (GitHub CLI) to be installed and authenticated.
+## Polling interval
 
-## Polling intervals
-
-- First 5 minutes: polls every **15 seconds**
-- After 5 minutes: polls every **60 seconds**
+Polls every **15 seconds** throughout. Jobs rarely run longer than 45 minutes and results are usually time-sensitive, so there's no backoff.

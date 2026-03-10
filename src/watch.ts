@@ -87,11 +87,13 @@ export async function watchRun({
   textFilters,
   openBrowser,
   timeoutMinutes,
+  quiet,
 }: {
   input: string | undefined;
   textFilters: string;
   openBrowser: boolean;
   timeoutMinutes: number;
+  quiet: boolean;
 }) {
   const runId = resolveRunId({ input, textFilters });
 
@@ -119,9 +121,7 @@ export async function watchRun({
   const jobStartMs = new Date(meta.createdAt).getTime();
   const timeoutMs = timeoutMinutes * 60 * 1000;
 
-  const FAST_INTERVAL = 15_000;
-  const SLOW_INTERVAL = 60_000;
-  const BACKOFF_AFTER = 5 * 60 * 1000;
+  const POLL_INTERVAL = 15_000;
 
   console.log("");
 
@@ -139,24 +139,29 @@ export async function watchRun({
 
     if (result.status === "completed") {
       const icon = result.conclusion === "success" ? "✅" : "❌";
-      console.log(
-        `\n${icon} Completed: ${result.conclusion}  (elapsed: ${formatElapsed(elapsed)})`
-      );
+      const summary = `${icon} ${result.conclusion}  elapsed: ${formatElapsed(elapsed)}`;
+      if (quiet) {
+        console.log(summary);
+      } else {
+        console.log(`\n${summary}`);
+      }
       if (openBrowser) openUrl(runUrl);
       process.exit(result.conclusion === "success" ? 0 : 1);
     }
 
-    const activeStep = result.jobs
-      .flatMap((j) => (j.status === "in_progress" ? j.steps : []))
-      .find((s) => s.status === "in_progress");
+    if (!quiet) {
+      const activeStep = result.jobs
+        .flatMap((j) => (j.status === "in_progress" ? j.steps : []))
+        .find((s) => s.status === "in_progress");
 
-    const stepDisplay = activeStep?.name ?? "-";
-    const elapsedStr = formatElapsed(elapsed);
+      const stepDisplay = activeStep?.name ?? "-";
+      const elapsedStr = formatElapsed(elapsed);
 
-    process.stdout.write(
-      `\r⏳ ${result.status.padEnd(12)}  step: ${stepDisplay.padEnd(40)}  elapsed: ${elapsedStr}   `
-    );
+      process.stdout.write(
+        `\r⏳ ${result.status.padEnd(12)}  step: ${stepDisplay.padEnd(40)}  elapsed: ${elapsedStr}   `
+      );
+    }
 
-    await sleep(elapsed > BACKOFF_AFTER ? SLOW_INTERVAL : FAST_INTERVAL);
+    await sleep(POLL_INTERVAL);
   }
 }
