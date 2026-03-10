@@ -79,6 +79,7 @@ Patterns are case-insensitive regular expressions, so `"CI"` matches `"CI / lint
 | `--text <filters>` | `CI,Deploy` | Priority-ordered comma-delimited workflow name filters |
 | `--no-open` | — | Don't open browser when run completes |
 | `--timeout <minutes>` | `35` | Give up after N minutes |
+| `--quiet` | — | Suppress intermediate status lines; only print the final result |
 
 ## Installation
 
