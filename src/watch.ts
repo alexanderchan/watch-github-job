@@ -9,13 +9,16 @@ interface RunStatus {
 }
 
 interface Job {
+  name: string;
   status: string;
+  conclusion: string | null;
   steps: Step[];
 }
 
 interface Step {
-  status: string;
   name: string;
+  status: string;
+  conclusion: string | null;
 }
 
 interface RunMeta {
@@ -145,6 +148,25 @@ export async function watchRun({
       } else {
         console.log(`\n${summary}`);
       }
+
+      if (result.conclusion !== "success") {
+        const failedJobs = result.jobs.filter(
+          (j) => j.conclusion && j.conclusion !== "success" && j.conclusion !== "skipped"
+        );
+        if (failedJobs.length > 0) {
+          console.log("\nFailed jobs:");
+          for (const job of failedJobs) {
+            console.log(`  ❌ ${job.name} (${job.conclusion})`);
+            const failedSteps = job.steps.filter(
+              (s) => s.conclusion && s.conclusion !== "success" && s.conclusion !== "skipped"
+            );
+            for (const step of failedSteps) {
+              console.log(`      • ${step.name} (${step.conclusion})`);
+            }
+          }
+        }
+      }
+
       if (openBrowser) openUrl(runUrl);
       process.exit(result.conclusion === "success" ? 0 : 1);
     }
